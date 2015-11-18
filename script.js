@@ -1,14 +1,17 @@
 $(document).ready(function() {
     
     var image_folder = 'imgs', container = '.slide-container'; 
-    var cycle_time = 5000, slide_speed = 500, remove_old_delay = 3000;
+    var cycle_time = 8000, slide_speed = 500, remove_old_delay = 3000;
+    var last_slide, before_last_slide;
     
     var bg_array = [], bg_array_on = [], bg_array_off = [], lg_img = [];
     
     init();
-    setInterval(function() {
-        picture_switcher();
-    }, cycle_time);
+    if(bg_array.length > 5) {
+        setInterval(function() {
+            picture_switcher();
+        }, cycle_time);
+    }
     
     
     // ----- Functions ----- //
@@ -21,7 +24,12 @@ $(document).ready(function() {
         slide();
         
         function choose_seesaw() {
-            var random = Math.floor(Math.random() * 4); // random number from 0 to 4
+            var random = Math.floor(Math.random() * 5); // random number from 0 to 4
+            while(random === last_slide || random === before_last_slide) {
+                random = Math.floor(Math.random() * 5);
+            }
+            before_last_slide = last_slide;
+            last_slide = random;
             return '#window' + random;
         }
         
