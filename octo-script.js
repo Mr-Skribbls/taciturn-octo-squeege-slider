@@ -1,16 +1,24 @@
 $(document).ready(function() {
     
-    var image_folder = 'imgs', container = '.slide-container'; 
-    var cycle_time = 8000, slide_speed = 500, remove_old_delay = 3000;
-    var last_slide, before_last_slide;
-    
-    var bg_array = [], bg_array_on = [], bg_array_off = [], lg_img = [];
+    globals = {
+        image_folder : 'imgs',
+        container : '.slide-container',
+        last_slide : null,
+        before_last_slide : null,
+        cycle_time : 3000,
+        slide_speed : 500
+    }
+    img_arrays = {
+        bg_array : [],
+        bg_array_on : [],
+        bg_array_off : []
+    }
     
     init();
-    if(bg_array.length > 5) {
+    if(img_arrays.bg_array.length > 5) {
         setInterval(function() {
             picture_switcher();
-        }, cycle_time);
+        }, globals.cycle_time);
     }
     
     
@@ -25,18 +33,18 @@ $(document).ready(function() {
         
         function choose_seesaw() {
             var random = Math.floor(Math.random() * 5); // random number from 0 to 4
-            while(random === last_slide || random === before_last_slide) {
+            while(random === globals.last_slide || random === globals.before_last_slide) {
                 random = Math.floor(Math.random() * 5);
             }
-            before_last_slide = last_slide;
-            last_slide = random;
+            globals.before_last_slide = globals.last_slide;
+            globals.last_slide = random;
             return '#window' + random;
         }
         
         function choose_new_img() {
-            var random = Math.floor(Math.random() * (bg_array_off.length - 1));
-            var new_img = bg_array_off.splice(random, 1);
-            bg_array_on.push(new_img[0]);
+            var random = Math.floor(Math.random() * (img_arrays.bg_array_off.length - 1));
+            var new_img = img_arrays.bg_array_off.splice(random, 1);
+            img_arrays.bg_array_on.push(new_img[0]);
             return new_img;
         }
         
@@ -44,8 +52,8 @@ $(document).ready(function() {
             var el_to_remove_img = $(seesaw_to_change + ' div').css('background-image').match(img_RegEx);
             
             // remove img from bg_array_on to bg_array_off
-            bg_array_on.splice(bg_array_on.indexOf(el_to_remove_img[0]), 1);
-            bg_array_off.push(el_to_remove_img[0]);
+            img_arrays.bg_array_on.splice(img_arrays.bg_array_on.indexOf(el_to_remove_img[0]), 1);
+            img_arrays.bg_array_off.push(el_to_remove_img[0]);
             
             // remove img from html
             $.each($(seesaw_to_change + ' div'), function() {
@@ -63,7 +71,7 @@ $(document).ready(function() {
         function slide() {
             $(seesaw_to_change).animate({
                 top: "-=100%"
-            }, slide_speed, function() {
+            }, globals.slide_speed, function() {
                 turn_off_old_img();
                 reset();
             });
@@ -83,47 +91,47 @@ $(document).ready(function() {
         html_contents += '<div class="box slider-large-container">';
         html_contents += '<div class="large">';
         html_contents += '<div id="window0" class="seesaw">';
-        html_contents += '<div class="small-img" style="background-image: url(\'' + bg_array_on[0] + '\')"></div>';
+        html_contents += '<div class="small-img" style="background-image: url(\'' + img_arrays.bg_array_on[0] + '\')"></div>';
         html_contents += '</div>';
         html_contents += '</div>';
         html_contents += '</div>';
         html_contents += '<div class="box slider-small-container">';
         html_contents += '<div class="small">';
         html_contents += '<div id="window1" class="seesaw">';
-        html_contents += '<div class="small-img" style="background-image: url(\'' + bg_array_on[1] + '\')"></div>';
+        html_contents += '<div class="small-img" style="background-image: url(\'' + img_arrays.bg_array_on[1] + '\')"></div>';
         html_contents += '</div>';
         html_contents += '</div>';
         html_contents += '<div class="small">';
         html_contents += '<div id="window2" class="seesaw">';
-        html_contents += '<div class="small-img" style="background-image: url(\'' + bg_array_on[2] + '\')"></div>';
+        html_contents += '<div class="small-img" style="background-image: url(\'' + img_arrays.bg_array_on[2] + '\')"></div>';
         html_contents += '</div>';
         html_contents += '</div>';
         html_contents += '</div>';
         html_contents += '<div class="box slider-small-container">';
         html_contents += '<div class="small">';
         html_contents += '<div id="window3" class="seesaw">';
-        html_contents += '<div class="small-img" style="background-image: url(\'' + bg_array_on[3] + '\')"></div>';
+        html_contents += '<div class="small-img" style="background-image: url(\'' + img_arrays.bg_array_on[3] + '\')"></div>';
         html_contents += '</div>';
         html_contents += '</div>';
         html_contents += '<div class="small">';
         html_contents += '<div id="window4" class="seesaw">';
-        html_contents += '<div class="small-img" style="background-image: url(\'' + bg_array_on[4] + '\')"></div>';
+        html_contents += '<div class="small-img" style="background-image: url(\'' + img_arrays.bg_array_on[4] + '\')"></div>';
         html_contents += '</div>';
         html_contents += '</div>';
         html_contents += '</div>';
         html_contents += '</div>';
         html_contents += '</div>';
         
-        $(container).html(html_contents);
-        $(container).removeClass('hidden');
+        $(globals.container).html(html_contents);
+        $(globals.container).removeClass('hidden');
     }
     
     // populate bg_array
     function populate_bg_array() {
         
-        // get images from html slider-container class
-        $.each($(container + ' img'), function() {
-            bg_array.push($(this).attr('src'));
+        // get images from container class
+        $.each($(globals.container + ' img'), function() {
+            img_arrays.bg_array.push($(this).attr('src'));
         });
         
     }
@@ -132,15 +140,15 @@ $(document).ready(function() {
     // first 4 objects in ob_array
     function populate_bg_array_on() {
         for( var i = 0; i < 5; i++ ) {
-            bg_array_on.push(bg_array[i]);
+            img_arrays.bg_array_on.push(img_arrays.bg_array[i]);
         }
     }
     
     // poulate bg_array_off
     // all objects in bg_array not in bg_array_on
     function populate_bg_array_off() {
-        for( var i = 0; i < bg_array.length; i++ ) {
-             if( ($.inArray(bg_array[i], bg_array_on)) === -1 ) bg_array_off.push(bg_array[i]);
+        for( var i = 0; i < img_arrays.bg_array.length; i++ ) {
+             if( ($.inArray(img_arrays.bg_array[i], img_arrays.bg_array_on)) === -1 ) img_arrays.bg_array_off.push(img_arrays.bg_array[i]);
         }
     }
     
@@ -152,7 +160,7 @@ $(document).ready(function() {
     
     // init
     function init() {
-        create_img_RegEx(image_folder);
+        create_img_RegEx(globals.image_folder);
         populate_bg_array();
 //        choose_lg_img();
         populate_bg_array_on();
